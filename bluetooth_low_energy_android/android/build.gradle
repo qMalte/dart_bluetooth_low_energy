@@ -7,7 +7,6 @@ buildscript {
         google()
         mavenCentral()
     }
-
     dependencies {
         classpath("com.android.tools.build:gradle:7.3.0")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
@@ -19,6 +18,17 @@ allprojects {
         google()
         mavenCentral()
     }
+    
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = '17'
+        }
+    }
 }
 
 apply plugin: "com.android.library"
@@ -28,41 +38,43 @@ android {
     if (project.android.hasProperty("namespace")) {
         namespace = "dev.hebei.bluetooth_low_energy_android"
     }
-
+    
     compileSdk = 34
-
+    
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
-
+    
     kotlinOptions {
         jvmTarget = "17"
+        apiVersion = "1.9"
+        languageVersion = "1.9"
     }
-
+    
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
         test.java.srcDirs += "src/test/kotlin"
     }
-
+    
     defaultConfig {
         minSdk = 21
     }
+}
 
-    dependencies {
-        testImplementation("org.jetbrains.kotlin:kotlin-test")
-        testImplementation("org.mockito:mockito-core:5.0.0")
-    }
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("org.mockito:mockito-core:5.0.0")
+}
 
-    testOptions {
-        unitTests.all {
-            useJUnitPlatform()
-
-            testLogging {
-               events "passed", "skipped", "failed", "standardOut", "standardError"
-               outputs.upToDateWhen {false}
-               showStandardStreams = true
-            }
+testOptions {
+    unitTests.all {
+        useJUnitPlatform()
+        testLogging {
+           events "passed", "skipped", "failed", "standardOut", "standardError"
+           outputs.upToDateWhen {false}
+           showStandardStreams = true
         }
     }
 }
